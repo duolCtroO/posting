@@ -5,7 +5,7 @@ import oort.cloud.status.FollowStatus;
 
 import java.util.*;
 
-public class InMemoryRepository implements UserRepository {
+public class InMemoryUserRepository implements UserRepository {
     private Map<String, User> userStore = new HashMap<>();
     private Map<User, List<User>> followerStore = new HashMap<>();
 

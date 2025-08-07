@@ -2,6 +2,7 @@ package oort.cloud;
 
 import oort.cloud.domain.User;
 import oort.cloud.exception.ApiException;
+import oort.cloud.query.PostingQuery;
 import oort.cloud.repository.PostingRepository;
 import oort.cloud.repository.UserRepository;
 import oort.cloud.status.FollowStatus;
@@ -21,19 +22,24 @@ public class Posting {
     }
 
     public Optional<SenderEndPoint> login(String userId, String password, ReceiverEndPoint receiverEndPoint){
-        User savedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new ApiException("등록된 유저 정보와 다릅니다"));
+        Optional<User> authUser = userRepository.findById(userId)
+                .filter(savedUser -> savedUser.getPassword().equals(password));
 
-        if(!password.equals(savedUser.getPassword())){
-            throw new ApiException("등록된 유저 정보와 다릅니다");
-        }
+        authUser.ifPresent(user -> {
+            user.online(receiverEndPoint);
+            chatterRepository.query(new PostingQuery()
+                                            .inUsers(user.getFollowings())
+                                            .lastSeenPosition(user.getLastseenPosition()),
+                    user::receivePosting
+            );
+        });
 
-        return Optional.of(senderEndPoint);
+        return authUser.map(user -> new SenderEndPoint(user, this));
     }
 
 
     public void registerUser(String userId, String password){
-        User user = User.create(userId, password);
+        User user = User.create(userId, password, new Position(-1), senderEndPoint);
 
         userRepository.save(user);
     }
