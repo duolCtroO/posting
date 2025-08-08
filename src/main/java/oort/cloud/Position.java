@@ -3,7 +3,7 @@ package oort.cloud;
 import java.util.Objects;
 
 public class Position {
-    private static final Position INITIAL_POSITION = new Position(-1);
+    public static final Position INITIAL_POSITION = new Position(-1);
 
     private final int value;
 
@@ -25,5 +25,9 @@ public class Position {
 
     public Position next() {
         return new Position(value + 1);
+    }
+
+    public int getValue() {
+        return value;
     }
 }

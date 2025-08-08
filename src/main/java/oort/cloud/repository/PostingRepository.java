@@ -6,8 +6,8 @@ import oort.cloud.query.PostingQuery;
 import java.util.function.Consumer;
 
 public interface PostingRepository {
-    void save();
-    void delete();
-    void update();
+    Posting save(Long id, String userId, String content);
+    void delete(Posting posting);
+    void update(Posting posting);
     void query(PostingQuery postingQuery, Consumer<Posting> callback);
 }

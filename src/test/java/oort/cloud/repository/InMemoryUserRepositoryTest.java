@@ -10,12 +10,10 @@ import org.mockito.Mock;
 
 class InMemoryUserRepositoryTest {
     private final InMemoryUserRepository repository = new InMemoryUserRepository();
-    @Mock
-    private SenderEndPoint senderEndPoint;
 
     @Test
     void save() {
-        User user = User.create("userId", "password", new Position(-1), senderEndPoint);
+        User user = User.create("userId", "password", new Position(-1));
         repository.save(user);
 
         User savedUser = repository.findById("userId").get();
@@ -27,8 +25,8 @@ class InMemoryUserRepositoryTest {
 
     @Test
     void duplicateSave() {
-        User user1 = User.create("userId", "password",  new Position(-1), senderEndPoint);
-        User user2 = User.create("userId", "password",  new Position(-1), senderEndPoint);
+        User user1 = User.create("userId", "password",  new Position(-1));
+        User user2 = User.create("userId", "password",  new Position(-1));
         repository.save(user1);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> repository.save(user2));
@@ -36,8 +34,8 @@ class InMemoryUserRepositoryTest {
 
     @Test
     void success_follow() {
-        User user1 = User.create("userId1", "password",  new Position(-1), senderEndPoint);
-        User user2 = User.create("userId2", "password",   new Position(-1), senderEndPoint);
+        User user1 = User.create("userId1", "password",  new Position(-1));
+        User user2 = User.create("userId2", "password",   new Position(-1));
         repository.save(user1);
         repository.save(user2);
 
@@ -48,8 +46,8 @@ class InMemoryUserRepositoryTest {
 
     @Test
     void fail_follow() {
-        User user1 = User.create("userId1", "password",   new Position(-1), senderEndPoint);
-        User user2 = User.create("userId2", "password",    new Position(-1), senderEndPoint);
+        User user1 = User.create("userId1", "password",   new Position(-1));
+        User user2 = User.create("userId2", "password",    new Position(-1));
         repository.save(user1);
 
         FollowStatus status = repository.follow(user1, user2);

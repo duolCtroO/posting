@@ -34,4 +34,8 @@ public class PostingQuery {
         return this;
     }
 
+    public boolean hasUsers() {
+        return users != null && !users.isEmpty();
+    }
+
 }

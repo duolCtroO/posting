@@ -21,14 +21,20 @@ public class User {
 
     private User(){}
 
-    public static User create(String userId, String password, Position lastseenPosition, SenderEndPoint senderEndPoint){
+    public static User create(String userId, String password, Position lastseenPosition){
         User user = new User();
         user.userId = Objects.requireNonNull(userId, "required userId");
 
         String plainPassword = Objects.requireNonNull(password, "required password");
         user.password = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
 
+        user.lastseenPosition = Objects.requireNonNull(lastseenPosition, "required position");
+
         return user;
+    }
+
+    public boolean authenticate(String password){
+        return BCrypt.checkpw(password, this.password);
     }
 
     public String getUserId() {

@@ -25,4 +25,20 @@ public class Posting {
     public Position getPosition() {
         return position;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getSenderId() {
+        return senderId;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public boolean isAfter(Position otherPosition) {
+        return this.position.getValue() > otherPosition.getValue();
+    }
 }

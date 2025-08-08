@@ -3,11 +3,13 @@ package oort.cloud;
 import oort.cloud.domain.User;
 import oort.cloud.status.FollowStatus;
 
+import java.util.Objects;
+
 public class SenderEndPoint {
     private final User user;
-    private final Posting chatter;
+    private final Chatter chatter;
 
-    public SenderEndPoint(User user, Posting chatter) {
+    public SenderEndPoint(User user, Chatter chatter) {
         this.user = user;
         this.chatter = chatter;
     }
@@ -16,9 +18,13 @@ public class SenderEndPoint {
         return chatter.follow(user, userIdToFollow);
     }
 
-    public Position sendPosting(final String userId, final String content){
-        return null;
+    public Position sendPosting(final Long id, final String content){
+        Objects.requireNonNull(content, "content must not be null");
+
+        return chatter.sendPosting(id, user, content);
     }
 
-
+    public User getUser() {
+        return user;
+    }
 }

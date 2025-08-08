@@ -1,7 +1,7 @@
 package oort.cloud;
 
+import oort.cloud.domain.Posting;
 import oort.cloud.domain.User;
-import oort.cloud.exception.ApiException;
 import oort.cloud.query.PostingQuery;
 import oort.cloud.repository.PostingRepository;
 import oort.cloud.repository.UserRepository;
@@ -9,25 +9,23 @@ import oort.cloud.status.FollowStatus;
 
 import java.util.Optional;
 
-public class Posting {
+public class Chatter {
 
     private final UserRepository userRepository;
-    private final PostingRepository chatterRepository;
-    private final SenderEndPoint senderEndPoint;
+    private final PostingRepository postingRepository;
 
-    public Posting(UserRepository userRepository, PostingRepository chatterRepository, SenderEndPoint senderEndPoint) {
+    public Chatter(UserRepository userRepository, PostingRepository postingRepository) {
         this.userRepository = userRepository;
-        this.chatterRepository = chatterRepository;
-        this.senderEndPoint = senderEndPoint;
+        this.postingRepository = postingRepository;
     }
 
     public Optional<SenderEndPoint> login(String userId, String password, ReceiverEndPoint receiverEndPoint){
         Optional<User> authUser = userRepository.findById(userId)
-                .filter(savedUser -> savedUser.getPassword().equals(password));
+                .filter(savedUser -> savedUser.authenticate(password));
 
         authUser.ifPresent(user -> {
             user.online(receiverEndPoint);
-            chatterRepository.query(new PostingQuery()
+            postingRepository.query(new PostingQuery()
                                             .inUsers(user.getFollowings())
                                             .lastSeenPosition(user.getLastseenPosition()),
                     user::receivePosting
@@ -39,8 +37,7 @@ public class Posting {
 
 
     public void registerUser(String userId, String password){
-        User user = User.create(userId, password, new Position(-1), senderEndPoint);
-
+        User user = User.create(userId, password, Position.INITIAL_POSITION);
         userRepository.save(user);
     }
 
@@ -48,5 +45,16 @@ public class Posting {
         return userRepository.findById(followerId)
                 .map(userToFollow -> userRepository.follow(follow, userToFollow))
                 .orElse(FollowStatus.INVALID_USER);
+    }
+
+    public Position sendPosting(Long id, User user, String content){
+        Posting savedPosting = postingRepository.save(id, user.getUserId(), content);
+
+        user.getFollowers()
+                .stream()
+                .filter(User::isOnline)
+                .forEach(follower -> follower.receivePosting(savedPosting));
+
+        return savedPosting.getPosition();
     }
 }

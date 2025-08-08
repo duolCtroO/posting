@@ -10,19 +10,16 @@ import org.mockito.Mock;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
-    @Mock
-    private SenderEndPoint senderEndPoint;
-
 
     @Test
     void create() {
-        User user = User.create("userId", "password", new Position(-1), senderEndPoint);
+        User user = User.create("userId", "password", new Position(-1));
         assertNotNull(user);
     }
 
     @Test
     void validate_password() {
-        User user = User.create("userId", "password", new Position(-1), senderEndPoint);
+        User user = User.create("userId", "password", new Position(-1));
         String savedPassword = user.getPassword();
 
         assertTrue(BCrypt.checkpw("password", savedPassword));
